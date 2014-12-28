@@ -24,20 +24,34 @@ rankhospital <- function(state, outcome, num = "best") {
     field <- "Hospital.30.Day.Death..Mortality..Rates.from.Pneumonia"
   }
   suppressWarnings(outcomeData[,field] <- as.numeric(outcomeData[,field]))
-  hospitals <- outcomeData[outcomeData$State == state,c("Hospital.Name",field,"State")]
-  hospitalsOrdered <- hospitals[,order(field, "State")]
-  hospitals <- hospitals[!is.na(hospitals)]
+  hospitals <- outcomeData[outcomeData$State == state & !is.na(outcomeData[field]),c("Hospital.Name",field,"State")]
+  
+  index <- order(hospitals[field], hospitals["Hospital.Name"])
+  hospitalsOrdered <- hospitals[index,]
+  maxNumber = nrow(hospitalsOrdered)
   if(num == "worst")
   {
-    num <- length(hospitals)
+    numIndex <- maxNumber
   }
-  if(num == "best")
+  else if(num == "best")
   {
-    num <- 1
+    numIndex <- 1
   }
+  else
+  {
+    numIndex <- as.numeric(num)
+  }
+  
  #names <- hospitals[rates == compareRate]
-  namesResult <- hospitals[num]
+ if(numIndex <= maxNumber)
+ {
+  namesResult <- hospitalsOrdered[numIndex,"Hospital.Name"]
   namesResult
+ }
+ else
+ {
+   NA
+ }
   ## Return hospital name in that state with lowest 30-day death
   ## rate
 }
